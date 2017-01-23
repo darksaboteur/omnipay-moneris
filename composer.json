@@ -1,0 +1,29 @@
+{
+    "name": "darksaboteur/omnipay-moneris",
+    "type": "library",
+    "description": "Moneris Canada driver for the Omnipay payment processing library",
+    "keywords": [
+        "gateway",
+        "merchant",
+        "omnipay",
+        "pay",
+        "moneris",
+        "payment"
+    ],
+    "homepage": "https://github.com/darksaboteur/omnipay-moneris",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Nicholas Brackley"
+        }
+    ],
+    "autoload": {
+        "psr-0": { "Omnipay\\MonerisCA\\" : "src/" }
+    },
+    "require": {
+        "omnipay/common": "~2.3"
+    },
+    "require-dev": {
+        "omnipay/tests": "~2.0"
+    }
+}
