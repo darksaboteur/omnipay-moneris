@@ -158,7 +158,7 @@ class PurchaseRequest extends AbstractRequest {
             ->post($this->getEndpoint(), $headers, $xml)
             ->send();
 
-        return $this->response = new RedirectResponse($this, $httpResponse->getBody());
+        return $this->response = new PurchaseResponse($this, $httpResponse->getBody());
     }
 
     /**
