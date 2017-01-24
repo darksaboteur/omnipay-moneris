@@ -29,7 +29,7 @@ class PurchaseResponse extends AbstractResponse {
         $responseDom = new DOMDocument;
         $responseDom->loadXML($data);
 
-        $this->data = simplexml_import_dom($responseDom->documentElement->firstChild->firstChild);
+        $this->data = simplexml_import_dom($responseDom->documentElement->firstChild);
     }
 
     /**
@@ -42,7 +42,7 @@ class PurchaseResponse extends AbstractResponse {
         $message = 'UNKNOWN ERROR';
 
         if (isset($this->data->Message)) {
-            $message = $this->data->Message;
+          $message = $this->data->Message->__toString();
         }
 
         return $message;
@@ -55,9 +55,9 @@ class PurchaseResponse extends AbstractResponse {
      * @return string
      */
     public function getTransactionReference() {
-        if (isset($this->data->ReferenceNum)) {
-            return $this->data->ReferenceNum;
-        }
+      if (isset($this->data->ReferenceNum)) {
+        return $this->data->ReferenceNum;
+      }
     }
 
     /**
@@ -78,9 +78,13 @@ class PurchaseResponse extends AbstractResponse {
      */
     public function isSuccessful() {
         if (isset($this->data->ResponseCode)) {
-            if ($this->data->ResponseCode >= 0 && $this->data->ResponseCode < 50) {
+          $response_code = $this->data->ResponseCode->__toString();
+          $complete = ($this->data->Complete->__toString() === "true");
+          if ($complete) {
+            if ($response_code >= 0 && $response_code < 50) {
                 return true;
             }
+          }
         }
         return false;
     }

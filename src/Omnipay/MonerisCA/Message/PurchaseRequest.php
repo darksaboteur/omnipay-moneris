@@ -14,6 +14,16 @@ class PurchaseRequest extends AbstractRequest {
 
     const EP_PATH = '/gateway2/servlet/MpgRequest';
 
+    public function initialize(array $parameters = []) {
+      $init = parent::initialize($parameters);
+
+      if (isset($parameters['customerId'])) {
+        $this->setParameter('customerId', $parameters['customerId']);
+      }
+
+      return $init;
+    }
+
     /**
      * Get accept header
      *
@@ -119,12 +129,23 @@ class PurchaseRequest extends AbstractRequest {
         $purchase = $data->addChild('purchase');
 
         $purchase->addChild('order_id', $this->getTransactionId());
-        //$purchase->addChild('cust_id', $this->getCustomerId());
+
+        $customer_id = $this->getParameter('customerId');
+        if ($customer_id) {
+          $purchase->addChild('cust_id', $customer_id);
+        }
         $purchase->addChild('amount', $this->getAmount());
         $purchase->addChild('pan', $this->getCard()->getNumber());
-        $purchase->addChild('expdate', $this->getCard()->getExpiryDate('Y').$this->getCard()->getExpiryDate('m'));
+        $purchase->addChild('expdate', $this->getCard()->getExpiryDate('y').$this->getCard()->getExpiryDate('m'));
         $purchase->addChild('crypt_type', 7);
-        //$purchase->addChild('dynamic_descriptor', '');
+        $purchase->addChild('dynamic_descriptor', $this->getDescription());
+
+        if ($this->getCard()->getCvv()) {
+          $cvd = $purchase->addChild('cvd_info');
+          $cvd->addChild('cvd_indicator', 1);
+          $cvd->addChild('cvd_value', $this->getCard()->getCvv());
+
+        }
 
         return $data;
     }
@@ -150,9 +171,7 @@ class PurchaseRequest extends AbstractRequest {
             'Content-Type'  => 'text/xml; charset=utf-8'
         ];
 
-
         $xml = $document->saveXML();
-
 
         $httpResponse = $this->httpClient
             ->post($this->getEndpoint(), $headers, $xml)
