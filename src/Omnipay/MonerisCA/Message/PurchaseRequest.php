@@ -2,6 +2,8 @@
 
 namespace Omnipay\MonerisCA\Message;
 
+use SimpleXMLElement;
+use DOMImplementation;
 use Omnipay\Common\CreditCard;
 use Omnipay\Common\Message\AbstractRequest;
 
@@ -115,13 +117,13 @@ class PurchaseRequest extends AbstractRequest {
      * Get data
      *
      * @access public
-     * @return \SimpleXMLElement
+     * @return SimpleXMLElement
      */
     public function getData() {
         $this->validate('amount', 'card');
         $this->getCard()->validate();
 
-        $data = new \SimpleXMLElement('<request />');
+        $data = new SimpleXMLElement('<request />');
 
         $merchant = $data->addChild('store_id', $this->getMerchant());
         $password = $data->addChild('api_token', $this->getPassword());
@@ -153,13 +155,13 @@ class PurchaseRequest extends AbstractRequest {
     /**
      * Send data
      *
-     * @param \SimpleXMLElement $data Data
+     * @param SimpleXMLElement $data Data
      *
      * @access public
      * @return RedirectResponse
      */
     public function sendData($data) {
-        $implementation = new \DOMImplementation();
+        $implementation = new DOMImplementation();
 
         $document = $implementation->createDocument(null, '');
         $document->encoding = 'utf-8';
@@ -174,10 +176,9 @@ class PurchaseRequest extends AbstractRequest {
         $xml = $document->saveXML();
 
         $httpResponse = $this->httpClient
-            ->post($this->getEndpoint(), $headers, $xml)
-            ->send();
+                             ->request('POST', $this->getEndpoint(), $headers, $xml);
 
-        return $this->response = new PurchaseResponse($this, $httpResponse->getBody());
+        return $this->response = new PurchaseResponse($this, $httpResponse->getBody()->getContents());
     }
 
     /**
