@@ -178,7 +178,7 @@ class PurchaseRequest extends AbstractRequest {
         $httpResponse = $this->httpClient
                              ->request('POST', $this->getEndpoint(), $headers, $xml);
 
-        return $this->response = new PurchaseResponse($this, simplexml_load_string($httpResponse->getBody()->getContents()));
+        return $this->response = new PurchaseResponse($this, $httpResponse->getBody()->getContents());
     }
 
     /**
